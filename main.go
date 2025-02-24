@@ -16,6 +16,7 @@ func main() {
 	http.HandleFunc("/get", handlers.GetChecks)
 	http.HandleFunc("/post", handlers.CreateCheck)
 	http.HandleFunc("/delete", handlers.DeleteCheck)
+	http.HandleFunc("/delete", handlers.UpdateCheck)
 
 	http.ListenAndServe(":8080", nil)
 
