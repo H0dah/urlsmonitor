@@ -1,10 +1,13 @@
 package check
 
+import "errors"
+
 // maps user id to list of checks
 var checksDB map[int][]Check
 
 type Check struct {
 	ID             string // Auto-generated unique ID
+	UserId         int    // Foreign key to associate with a User
 	Name           string
 	Url            string
 	Protocol       string //HTTP, HTTPS, TCP
@@ -19,7 +22,6 @@ type Check struct {
 	Assert         []string
 	Tags           []string
 	IgnoreSSL      bool //True--> ignore
-	UserId         int  // Foreign key to associate with a User
 }
 
 type User struct {
@@ -42,9 +44,23 @@ func DeleteCheck(userId int, checkId string) {
 		if check.ID == checkId {
 			userChecks = append(userChecks[:i], userChecks[i+1:]...)
 			checksDB[userId] = userChecks
-			return
 
 		}
 
 	}
+}
+
+func UpdateCheck(check Check) error {
+	userId := check.UserId
+	checkId := check.ID
+	userChecks := checksDB[userId]
+
+	for i, c := range userChecks {
+		if c.ID == checkId {
+			userChecks[i] = check
+			checksDB[userId] = userChecks
+			return nil
+		}
+	}
+	return errors.New("check not found")
 }
